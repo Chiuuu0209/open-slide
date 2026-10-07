@@ -82,6 +82,14 @@ If the user asked for a speech script / speaker notes (in the initial request or
 
 Run the checklist in `slide-authoring` ("Self-review before finishing"). It covers structural correctness, layout discipline, and asset existence.
 
+Export the pages you wrote and look at the PNGs before handing off:
+
+```bash
+open-slide screenshot --slide <id>
+```
+
+That command starts a temporary preview and exits. It is not the dev server — run it even if you were not asked to start `dev`. If it reports that Chrome or Chromium is missing, install the browser and re-run. Don't skip a page that looks tight in the budget math.
+
 ## Step 8 — Hand off to the user
 
 Tell the user:
