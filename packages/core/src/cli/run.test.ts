@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parsePort } from './run.ts';
+import { createProgram, parsePage, parsePort } from './run.ts';
 
 describe('parsePort', () => {
   it('accepts valid integer ports', () => {
@@ -22,5 +22,25 @@ describe('parsePort', () => {
 
   it('rejects non-integer numbers', () => {
     expect(() => parsePort('80.5')).toThrow(/Invalid port/);
+  });
+});
+
+describe('parsePage', () => {
+  it('accepts 1-based page numbers', () => {
+    expect(parsePage('1')).toBe(1);
+    expect(parsePage('12')).toBe(12);
+  });
+
+  it('rejects zero, fractions, and junk', () => {
+    expect(() => parsePage('0')).toThrow(/Invalid page/);
+    expect(() => parsePage('1.5')).toThrow(/Invalid page/);
+    expect(() => parsePage('a')).toThrow(/Invalid page/);
+  });
+});
+
+describe('createProgram', () => {
+  it('registers screenshot export', () => {
+    const command = createProgram().commands.find((entry) => entry.name() === 'screenshot');
+    expect(command?.description()).toMatch(/PNG/);
   });
 });

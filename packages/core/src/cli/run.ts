@@ -15,6 +15,22 @@ export function parsePort(value: string): number {
   return n;
 }
 
+export function parsePage(value: string): number {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 1) {
+    throw new Error(`Invalid page: ${value}`);
+  }
+  return n;
+}
+
+function collectString(value: string, previous: string[] = []): string[] {
+  return [...previous, value];
+}
+
+function collectPage(value: string, previous: number[] = []): number[] {
+  return [...previous, parsePage(value)];
+}
+
 interface ServerFlags {
   port?: number;
   host?: string | boolean;
@@ -70,6 +86,13 @@ interface BuildFlags {
   outDir?: string;
 }
 
+interface ScreenshotFlags {
+  slide?: string[];
+  page?: number[];
+  out?: string;
+  port?: number;
+}
+
 interface SyncFlags {
   dryRun?: boolean;
 }
@@ -80,7 +103,7 @@ function resolveBuiltinSkillsDir(): string {
   return path.resolve(here, '..', '..', 'skills');
 }
 
-export async function run(argv: string[]): Promise<void> {
+export function createProgram(): Command {
   const program = new Command();
   program
     .name('open-slide')
@@ -128,6 +151,25 @@ export async function run(argv: string[]): Promise<void> {
     });
 
   program
+    .command('screenshot')
+    .description('Export rendered slide pages as PNG files')
+    .option(
+      '-s, --slide <id>',
+      'slide id to export (repeatable; default: every slide)',
+      collectString,
+    )
+    .option('--page <n>', '1-based page to export (repeatable; default: every page)', collectPage)
+    .option('--out <dir>', 'directory to write PNG files into', 'screenshots')
+    .addOption(
+      new Option('--port <port>', 'port for the temporary dev server').argParser(parsePort),
+    )
+    .action(async (flags: ScreenshotFlags) => {
+      await assertViteResolvesToCore();
+      const { screenshot } = await import('./screenshot.ts');
+      await screenshot(flags);
+    });
+
+  program
     .command('sync:skills')
     .description('Sync built-in skills from @open-slide/core into this workspace')
     .option('--dry-run', 'show what would change without writing')
@@ -135,5 +177,9 @@ export async function run(argv: string[]): Promise<void> {
       await syncSkills(resolveBuiltinSkillsDir(), flags);
     });
 
-  await program.parseAsync(argv, { from: 'user' });
+  return program;
+}
+
+export async function run(argv: string[]): Promise<void> {
+  await createProgram().parseAsync(argv, { from: 'user' });
 }
