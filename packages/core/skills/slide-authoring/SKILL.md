@@ -133,7 +133,13 @@ The canvas does **not** scroll. Anything past the 1080px bottom edge is silently
 | 4 gaps between bullets: 24px each        | 96px                    |
 | **Total**                                | **816px ✅ fits in 840** |
 
-Swap the heading to 120px or add a 6th bullet and you're over. **Verify every page like this before you write it.**
+Swap the heading to 120px or add a 6th bullet and you're over. **Verify every page like this before you write it.** After the page exists, export it and look at the PNG — the arithmetic is a guess, and overflow is invisible in the source:
+
+```bash
+open-slide screenshot --slide <id> --page <n>
+```
+
+PNGs land in `screenshots/` as `<id>-p<NN>.png`. A missing Chrome or Chromium binary exits non-zero with an install hint; install it and re-run.
 
 **Page-level rules:**
 
@@ -342,6 +348,7 @@ This applies whenever the *visual element* repeats, not whenever the *data* does
 - [ ] Every page's root fills `100% × 100%`.
 - [ ] Content lives inside padding (no text kisses the edge).
 - [ ] **For every page, sum (font_size × line_height × lines) + gaps + 2×padding ≤ 1080px.** If close, split the page. No `overflow: auto` escape hatches.
+- [ ] **Exported the pages you changed and looked at the PNGs** (`open-slide screenshot --slide <id> --page <n>`, or omit `--page` for the whole deck). Check for overflow, clipping, and collisions.
 - [ ] No bullet wraps to a second line at the chosen font size.
 - [ ] One coherent visual direction across every page (palette + type scale).
 - [ ] Slide declares a top-level `export const design: DesignSystem = { … }` and references the values via `var(--osd-X)` (use `design.X` only when you need a JS number for arithmetic). Only omit the `design` const for a one-off slide whose palette is intentionally locked.
