@@ -1610,7 +1610,7 @@ export function InspectPanelButton() {
       data-inspector-ui
     >
       <PanelRight className="size-3.5" />
-      <span className="hidden md:inline">{t.inspector.format}</span>
+      <span className="hidden lg:inline">{t.inspector.format}</span>
     </Button>
   );
 }
